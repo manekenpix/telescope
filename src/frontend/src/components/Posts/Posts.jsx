@@ -4,6 +4,7 @@ import { Container, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import SentimentDissatisfiedRoundedIcon from '@material-ui/icons/SentimentDissatisfiedRounded';
 import Timeline from './Timeline.jsx';
+import Outline from './Outline.jsx';
 import useSiteMetaData from '../../hooks/use-site-metadata';
 
 const useStyles = makeStyles(() => ({
@@ -23,6 +24,10 @@ const useStyles = makeStyles(() => ({
     color: '#B5B5B5',
     fontSize: '10rem',
     paddingBottom: 0,
+  },
+  outline: {
+    flexGrow: 1,
+    float: 'right',
   },
 }));
 
@@ -62,6 +67,7 @@ const Posts = () => {
 
   return (
     <Container className={classes.root}>
+      <Outline className={classes.outline} />
       <Timeline pages={data} nextPage={() => setSize(size + 1)} />
     </Container>
   );
