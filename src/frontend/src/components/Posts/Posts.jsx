@@ -9,6 +9,9 @@ import useSiteMetaData from '../../hooks/use-site-metadata';
 
 const useStyles = makeStyles(() => ({
   root: {
+    flexGrow: 1,
+  },
+  posts: {
     padding: 0,
     maxWidth: '785px',
   },
@@ -66,10 +69,14 @@ const Posts = () => {
   }
 
   return (
-    <Container className={classes.root}>
-      <Outline className={classes.outline} />
-      <Timeline pages={data} nextPage={() => setSize(size + 1)} />
-    </Container>
+    <Grid container className={classes.root}>
+      <Grid item xs={3}>
+        <Outline className={classes.outline} />
+      </Grid>
+      <Grid item className={classes.posts} item xs={9}>
+        <Timeline pages={data} nextPage={() => setSize(size + 1)} />
+      </Grid>
+    </Grid>
   );
 };
 
