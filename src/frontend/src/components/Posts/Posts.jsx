@@ -68,12 +68,14 @@ const Posts = () => {
     );
   }
 
+  // console.log(data);
+
   return (
     <Grid container className={classes.root}>
-      <Grid item xs={3}>
-        <Outline className={classes.outline} />
+      <Grid item xs={4}>
+        <Outline posts={data} />
       </Grid>
-      <Grid item className={classes.posts} item xs={9}>
+      <Grid item className={classes.posts} xs={8}>
         <Timeline pages={data} nextPage={() => setSize(size + 1)} />
       </Grid>
     </Grid>
