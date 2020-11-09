@@ -37,6 +37,10 @@ const useStyles = makeStyles(() => ({
 const REFRESH_INTERVAL = 5 * 60 * 1000; /* refresh data every 5 minutes */
 
 const Posts = () => {
+  const { ref, inView, entry } = useInView({
+    /* Optional options */
+    threshold: 0,
+  });
   const classes = useStyles();
   const { telescopeUrl } = useSiteMetaData();
   const { data, size, setSize, error } = useSWRInfinite(
@@ -73,10 +77,10 @@ const Posts = () => {
   return (
     <Grid container className={classes.root}>
       <Grid item xs={4}>
-        <Outline posts={data} />
+        <Outline posts={data} view={inView} entry={entry} />
       </Grid>
       <Grid item className={classes.posts} xs={8}>
-        <Timeline pages={data} nextPage={() => setSize(size + 1)} />
+        <Timeline pages={data} nextPage={() => setSize(size + 1)} interRef={ref} />
       </Grid>
     </Grid>
   );

@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Timeline = ({ pages, nextPage }) => {
+const Timeline = ({ pages, nextPage, ref }) => {
   const classes = useStyles();
   const { telescopeUrl } = useSiteMetaData();
 
@@ -37,7 +37,11 @@ const Timeline = ({ pages, nextPage }) => {
   // Iterate over all the pages (an array of arrays) and then convert all post
   // elements to <Post>
   const postsTimeline = pages.map((page) =>
-    page.map(({ id, url }) => <Post postUrl={`${telescopeUrl}${url}`} key={id} />)
+    page.map(({ id, url }) => (
+      <div ref={ref} key={id}>
+        <Post postUrl={`${telescopeUrl}${url}`} key={id} />
+      </div>
+    ))
   );
 
   // Add a "Load More" button at the end of the timeline.  Give it a unique
@@ -47,13 +51,13 @@ const Timeline = ({ pages, nextPage }) => {
       <LoadMoreButton onClick={() => nextPage()} key={`load-more-button-${pages.length}`} />
     );
   }
-
   return <Container className={classes.root}>{postsTimeline}</Container>;
 };
 
 Timeline.propTypes = {
   pages: PropTypes.array,
   nextPage: PropTypes.func,
+  ref: PropTypes.shape({ current: PropTypes.any }),
 };
 
 export default Timeline;
