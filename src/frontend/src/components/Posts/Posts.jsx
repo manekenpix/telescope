@@ -4,7 +4,7 @@ import { Container, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import SentimentDissatisfiedRoundedIcon from '@material-ui/icons/SentimentDissatisfiedRounded';
 import Timeline from './Timeline.jsx';
-import Outline from './Outline.jsx';
+import Outline from './Outline';
 import useSiteMetaData from '../../hooks/use-site-metadata';
 
 const useStyles = makeStyles(() => ({
