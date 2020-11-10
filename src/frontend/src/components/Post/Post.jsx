@@ -1,6 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import useSWR from 'swr';
+import { useInView } from 'react-intersection-observer';
 import 'highlight.js/styles/github.css';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Grid, Typography, ListSubheader } from '@material-ui/core';
@@ -8,6 +9,8 @@ import './telescope-post-content.css';
 import Spinner from '../Spinner/Spinner.jsx';
 import ErrorRoundedIcon from '@material-ui/icons/ErrorRounded';
 import AdminButtons from '../AdminButtons';
+
+import { ObserverDispatchContext } from '../../contexts/Observer/ObserverContext';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -88,11 +91,23 @@ const formatPublishedDate = (dateString) => {
 };
 
 const Post = ({ postUrl }) => {
+  const dispatch = useContext(ObserverDispatchContext);
+  const { ref, inView } = useInView({
+    rootMargin: '10%',
+  });
+
+  // id, html, author, url, title, date, link
   const classes = useStyles();
   // We need a ref to our post content, which we inject into a <section> below.
   const sectionEl = useRef(null);
   // Grab the post data from our backend so we can render it
   const { data: post, error } = useSWR(postUrl, (url) => fetch(url).then((r) => r.json()));
+
+  useEffect(() => {
+    if (inView) {
+      dispatch({ type: 'SELECT_POST', payload: postUrl.substring(postUrl.lastIndexOf('/') + 1) });
+    }
+  }, [inView]);
 
   if (error) {
     console.error(`Error loading post at ${postUrl}`, error);
@@ -137,35 +152,37 @@ const Post = ({ postUrl }) => {
   }
 
   return (
-    <Box className={classes.root} boxShadow={2}>
-      <ListSubheader className={classes.header}>
-        <AdminButtons />
-        <Typography variant="h1" title={post.title} id={post.id} className={classes.title}>
-          {post.title}
-        </Typography>
-        <Typography variant={'p'} className={classes.author}>
-          &nbsp;By&nbsp;
-          <a className={classes.link} href={post.feed.link}>
-            {post.feed.author}
+    <div ref={ref}>
+      <Box className={classes.root} boxShadow={2}>
+        <ListSubheader className={classes.header}>
+          <AdminButtons />
+          <Typography variant="h1" title={post.title} id={post.id} className={classes.title}>
+            {post.title}
+          </Typography>
+          <Typography variant="h3" className={classes.author}>
+            By{' '}
+            <a className={classes.link} href={post.feed.link}>
+              {post.feed.author}
+            </a>
+          </Typography>
+          <a href={post.url} rel="bookmark" className={classes.published}>
+            <time className={classes.time} dateTime={post.updated}>
+              {formatPublishedDate(post.updated)}
+            </time>
           </a>
-        </Typography>
-        <a href={post.url} rel="bookmark" className={classes.published}>
-          <time className={classes.time} dateTime={post.updated}>
-            {` ${formatPublishedDate(post.updated)}`}
-          </time>
-        </a>
-      </ListSubheader>
+        </ListSubheader>
 
-      <Grid container>
-        <Grid item xs={12} className={classes.content}>
-          <section
-            ref={sectionEl}
-            className="telescope-post-content"
-            dangerouslySetInnerHTML={{ __html: post.html }}
-          />
+        <Grid container>
+          <Grid item xs={12} className={classes.content}>
+            <section
+              ref={sectionEl}
+              className="telescope-post-content"
+              dangerouslySetInnerHTML={{ __html: post.html }}
+            />
+          </Grid>
         </Grid>
-      </Grid>
-    </Box>
+      </Box>
+    </div>
   );
 };
 

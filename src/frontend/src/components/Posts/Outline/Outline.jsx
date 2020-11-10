@@ -4,10 +4,8 @@ import PropTypes from 'prop-types';
 import useSiteMetaData from '../../../hooks/use-site-metadata';
 import PostReference from './PostReference.jsx';
 
-const Outline = ({ posts, inView, entry }) => {
+const Outline = ({ posts }) => {
   const { telescopeUrl } = useSiteMetaData();
-  console.log(inView);
-  console.log(entry);
 
   if (!posts) return <div>Loading...</div>;
 
