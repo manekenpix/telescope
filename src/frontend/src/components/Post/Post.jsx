@@ -152,37 +152,37 @@ const Post = ({ postUrl }) => {
   }
 
   return (
-    <div ref={ref}>
-      <Box className={classes.root} boxShadow={2}>
-        <ListSubheader className={classes.header}>
-          <AdminButtons />
-          <Typography variant="h1" title={post.title} id={post.id} className={classes.title}>
-            {post.title}
-          </Typography>
-          <Typography variant="h3" className={classes.author}>
-            By{' '}
-            <a className={classes.link} href={post.feed.link}>
-              {post.feed.author}
-            </a>
-          </Typography>
-          <a href={post.url} rel="bookmark" className={classes.published}>
-            <time className={classes.time} dateTime={post.updated}>
-              {formatPublishedDate(post.updated)}
-            </time>
+    <Box className={classes.root} boxShadow={2}>
+      <ListSubheader className={classes.header}>
+        <AdminButtons />
+        <Typography variant="h1" title={post.title} id={post.id} className={classes.title}>
+          {post.title}
+        </Typography>
+        <Typography variant="h3" className={classes.author}>
+          By{' '}
+          <a className={classes.link} href={post.feed.link}>
+            {post.feed.author}
           </a>
-        </ListSubheader>
+        </Typography>
+        <a href={post.url} rel="bookmark" className={classes.published}>
+          <time className={classes.time} dateTime={post.updated}>
+            {formatPublishedDate(post.updated)}
+          </time>
+        </a>
+      </ListSubheader>
 
-        <Grid container>
-          <Grid item xs={12} className={classes.content}>
+      <Grid container>
+        <Grid item xs={12} className={classes.content}>
+          <div ref={ref}>
             <section
               ref={sectionEl}
               className="telescope-post-content"
               dangerouslySetInnerHTML={{ __html: post.html }}
             />
-          </Grid>
+          </div>
         </Grid>
-      </Box>
-    </div>
+      </Grid>
+    </Box>
   );
 };
 
