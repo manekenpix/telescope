@@ -1,13 +1,13 @@
 import React, { useRef, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import useSWR from 'swr';
-import { useInView } from 'react-intersection-observer';
+// import { useInView } from 'react-intersection-observer';
 import 'highlight.js/styles/github.css';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Grid, Typography, ListSubheader } from '@material-ui/core';
 import './telescope-post-content.css';
-import Spinner from '../Spinner/Spinner.jsx';
 import ErrorRoundedIcon from '@material-ui/icons/ErrorRounded';
+import Spinner from '../Spinner/Spinner.jsx';
 import AdminButtons from '../AdminButtons';
 
 import { ObserverDispatchContext } from '../../contexts/Observer/ObserverContext';
@@ -92,9 +92,10 @@ const formatPublishedDate = (dateString) => {
 
 const Post = ({ postUrl }) => {
   const dispatch = useContext(ObserverDispatchContext);
-  const { ref, inView } = useInView({
+  const postRef = useRef(null);
+  /* const { ref, inView } = useInView({
     rootMargin: '10%',
-  });
+  }); */
 
   // id, html, author, url, title, date, link
   const classes = useStyles();
@@ -104,10 +105,31 @@ const Post = ({ postUrl }) => {
   const { data: post, error } = useSWR(postUrl, (url) => fetch(url).then((r) => r.json()));
 
   useEffect(() => {
-    if (inView) {
-      dispatch({ type: 'SELECT_POST', payload: postUrl.substring(postUrl.lastIndexOf('/') + 1) });
-    }
-  }, [inView]);
+    const options = {
+      rootMargin: '10%',
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            console.log(entry.isIntersecting);
+            dispatch({
+              type: 'SELECT_POST',
+              payload: postUrl.substring(postUrl.lastIndexOf('/') + 1),
+            });
+          }
+        }),
+      options
+    );
+
+    if (post) observer.observe(postRef.current);
+    /* if (inView) {
+    } */
+    return () => {
+      observer.unobserve(postRef.current);
+    };
+  }, []);
 
   if (error) {
     console.error(`Error loading post at ${postUrl}`, error);
@@ -153,7 +175,7 @@ const Post = ({ postUrl }) => {
 
   return (
     <Box className={classes.root} boxShadow={2}>
-      <ListSubheader className={classes.header}>
+      <ListSubheader className={classes.header} ref={postRef}>
         <AdminButtons />
         <Typography variant="h1" title={post.title} id={post.id} className={classes.title}>
           {post.title}
@@ -173,13 +195,11 @@ const Post = ({ postUrl }) => {
 
       <Grid container>
         <Grid item xs={12} className={classes.content}>
-          <div ref={ref}>
-            <section
-              ref={sectionEl}
-              className="telescope-post-content"
-              dangerouslySetInnerHTML={{ __html: post.html }}
-            />
-          </div>
+          <section
+            ref={sectionEl}
+            className="telescope-post-content"
+            dangerouslySetInnerHTML={{ __html: post.html }}
+          />
         </Grid>
       </Grid>
     </Box>
