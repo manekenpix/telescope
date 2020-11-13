@@ -1,16 +1,22 @@
 import React, { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { ListItem } from '@material-ui/core';
-// import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import useSWR from 'swr';
 import { ObserverStateContext } from '../../../contexts/Observer/ObserverContext';
 
-// const useStyles = makeStyles((theme) => ({
-// }));
+const useStyles = makeStyles((theme) => ({
+  root: {
+    color: theme.palette.primary.main,
+  },
+  selected: {
+    background: 'red',
+  }
+}));
 
 const PostReference = ({ postUrl }) => {
+  const classes = useStyles();
   const inViewPost = useContext(ObserverStateContext);
-  // const classes = useStyles();
   const { data: post } = useSWR(postUrl, (url) => fetch(url).then((r) => r.json()));
 
   useEffect(() => {
@@ -25,13 +31,14 @@ const PostReference = ({ postUrl }) => {
 
   return (
     <ListItem
+      className={classes.root}
       button
       component="a"
       href={`#${postUrl.substring(postUrl.lastIndexOf('/') + 1)}`}
-      // className={classes.root}
       primary={`${post.feed.author}`}
       secondary={`${post.title}`}
       selected={postUrl.lastIndexOf('/') + 1 === inViewPost}
+      selectedItemStyle={classes.selected}
     ></ListItem>
   );
 };
