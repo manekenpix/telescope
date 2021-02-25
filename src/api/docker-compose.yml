@@ -46,3 +46,26 @@ services:
       - 'traefik.http.middlewares.strip_api_prefix.stripprefix.prefixes=/${API_VERSION}/image'
       - 'traefik.http.middlewares.strip_api_prefix.stripprefix.forceSlash=true'
       - 'traefik.http.routers.image.middlewares=strip_api_prefix'
+
+  image:
+    container_name: 'stats'
+    build:
+      context: ./stats
+      dockerfile: Dockerfile
+    environment:
+      - STATS_PORT
+    ports:
+      - '${STATS_PORT}'
+    depends_on:
+      - traefik
+    labels:
+      # Enable Traefik on the stats service container
+      - 'traefik.enable=true'
+      # Traefik routing for the stats service at /v1/stats
+      - 'traefik.http.routers.stats.rule=Host(`${API_HOST}`) && PathPrefix(`/${API_VERSION}/stats`)'
+      # Specify the image service port
+      - 'traefik.http.services.stats.loadbalancer.server.port=${STATS_PORT}'
+      # Add middleware to this route to strip the /v1/image prefix and use gzip compression
+      - 'traefik.http.middlewares.strip_api_prefix.stripprefix.prefixes=/${API_VERSION}/stats'
+      - 'traefik.http.middlewares.strip_api_prefix.stripprefix.forceSlash=true'
+      - 'traefik.http.routers.stats.middlewares=strip_api_prefix'
