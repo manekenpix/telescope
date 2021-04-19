@@ -66,14 +66,6 @@ const postUser = async (user) => {
 const postUsers = async (users) =>
   Promise.all(
     users.map((user) =>
-      /* fetch(`${USERS_URL}/${hash(user.email)}`, {
-        method: 'post',
-        headers: {
-          Authorization: `bearer ${createServiceToken()}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user),
-      }) */
       postUser(user)
         .then((res) => {
           // We should get a 201 (created), but if the user exists, a 400 (which is fine here)
@@ -114,21 +106,9 @@ const deleteUser = async (user) => {
 };
 
 // Delete the Telescope users we created in the Users service.
-const deleteUsers = async (users) =>
-  Promise.all(
-    users.map((user) =>
-      /*fetch(`${USERS_URL}/${hash(user.email)}`, {
-        method: 'delete',
-        headers: {
-          Authorization: `bearer ${createServiceToken()}`,
-        },
-      }) */
-      deleteUser(user)
-    )
-  );
+const deleteUsers = async (users) => Promise.all(users.map((user) => deleteUser(user)));
 
 module.exports.USERS_URL = USERS_URL;
-// module.exports.clearData = clearData;
 module.exports.getUser = getUser;
 module.exports.getUsers = getUsers;
 module.exports.getUsersPaginated = getUsersPaginated;
