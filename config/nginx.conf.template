@@ -38,6 +38,10 @@ events {
 }
 
 http {
+  # Rate limit
+  # https://www.nginx.com/blog/rate-limiting-nginx/#Configuring-Basic-Rate-Limiting
+  limit_req_zone $binary_remote_addr zone=limit:10m rate=50r/s;
+
   # Use utf-8 for the charset on our content-type headers
   charset   utf-8;
 
@@ -155,6 +159,10 @@ http {
     server_name ${API_HOST};
 
     location / {
+      # Burst and nodelay
+      # https://www.nginx.com/blog/rate-limiting-nginx/#bursts
+      limit_req zone=limit burst=20 nodelay;
+
       proxy_set_header  Host            $host;
       proxy_set_header  X-Real-IP       $remote_addr;
       proxy_set_header  X-Forwarded-for $remote_addr;
@@ -188,6 +196,10 @@ http {
 
     # Cache content served by /legacy forever
     location /legacy {
+      # Burst and nodelay
+      # https://www.nginx.com/blog/rate-limiting-nginx/#bursts
+      limit_req zone=limit burst=20 nodelay;
+
       expires max;
       add_header Cache-Control "public, max-age=31536000, immutable";
       proxy_pass http://telescope:3000;
@@ -209,6 +221,10 @@ http {
 
     # Static next.js front-end
     location / {
+      # Burst and nodelay
+      # https://www.nginx.com/blog/rate-limiting-nginx/#bursts
+      limit_req zone=limit burst=20 nodelay;
+
       # Directory from which we serve Next's static content
       root /var/www/data;
 
@@ -244,6 +260,10 @@ http {
     }
 
     location @proxy {
+      # Burst and nodelay
+      # https://www.nginx.com/blog/rate-limiting-nginx/#bursts
+      limit_req zone=limit burst=20 nodelay;
+
       proxy_cache telescope_cache;
 
       # Defines conditions under which the response will not be taken from a cache
